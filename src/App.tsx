@@ -1,21 +1,12 @@
-import { useEffect, useState } from 'react';
+import { AuthProvider } from './context/AuthContext';
 import Router from './router/Router';
-import './App.css'
-import publicRoutes from './router/routes/publicRoutes';
-import { getRoutes } from './router/routes';
 
-function App() {
-  const [allRoutes, setAllRoutes] = useState([...publicRoutes])
-  
-  useEffect(()=>{
-    const routes = getRoutes();
-    setAllRoutes([...allRoutes,routes])
-    
-  },[])
+const App = () => {
+  return (
+    <AuthProvider>
+      <Router />
+    </AuthProvider>
+  );
+};
 
-  
-  return <Router allRoutes={allRoutes} />
-  
-}
-
-export default App
+export default App;
