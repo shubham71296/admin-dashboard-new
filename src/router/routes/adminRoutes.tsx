@@ -12,53 +12,53 @@ import Sellers from "../../views/admin/Sellers";
 
 export const adminRoutes = [
   {
-    path: "/admin/dashboard",
+    path: "admin/dashboard",
     element: <AdminDashboard />,
     role:"admin"
   },
   {
-    path: "/admin/dashboard/orders",
+    path: "admin/dashboard/orders",
     element: <Orders />,
     role:"admin"
   },
 
   {
-    path: "/admin/dashboard/order-details/:id",
+    path: "admin/dashboard/order-details/:id",
     element: <OrderDetails />,
     role:"admin"
   },
   {
-    path: "/admin/dashboard/category",
+    path: "admin/dashboard/category",
     element: <Category />,
     role:"admin"
   },
   {
-    path: "/admin/dashboard/sellers",
+    path: "admin/dashboard/sellers",
     element: <Sellers />,
     role:"admin"
   },
   {
-    path: "/admin/dashboard/payment-request",
+    path: "admin/dashboard/payment-request",
     element: <PaymentRequest />,
     role:"admin"
   },
   {
-    path: "/admin/dashboard/deactive-sellers",
+    path: "admin/dashboard/deactive-sellers",
     element: <DeactiveSellers />,
     role:"admin"
   },
   {
-    path: "/admin/dashboard/seller-request",
+    path: "admin/dashboard/seller-request",
     element: <SellerRequest />,
     role:"admin"
   },
   {
-    path: "/admin/dashboard/seller-details/:id",
+    path: "admin/dashboard/seller-details/:id",
     element: <SellerDetails />,
     role:"admin"
   },
   {
-    path: "/admin/dashboard/live-chat",
+    path: "admin/dashboard/live-chat",
     element: <LiveChat />,
     role:"admin"
   },

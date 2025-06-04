@@ -88,7 +88,7 @@ export const allNavs: allNavsProps[] = [
     title: "Dashboard",
     icon: <MdOutlineDashboard />,
     role: "seller",
-    path: "/seller/dashboard/",
+    path: "/seller/dashboard",
   },
   {
     id: 10,

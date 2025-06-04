@@ -9,42 +9,42 @@ import Orders from "../../views/seller/Orders";
 
 export const sellerRoutes = [
   {
-    path: "/seller/dashboard",
+    path: "seller/dashboard",
     element: <SellerDashboard />,
     role:"seller"
   },
   {
-    path: "/seller/dashboard/add-product",
+    path: "seller/dashboard/add-product",
     element: <AddProduct />,
     role:"seller"
   },
   {
-    path: "/seller/dashboard/all-products",
+    path: "seller/dashboard/all-products",
     element: <AllProducts />,
     role:"seller"
   },
   {
-    path: "/seller/dashboard/discount-product",
+    path: "seller/dashboard/discount-product",
     element: <DiscountProduct />,
     role:"seller"
   },
   {
-    path: "/seller/dashboard/orders",
+    path: "seller/dashboard/orders",
     element: <Orders />,
     role:"seller"
   },
   {
-    path: "/seller/dashboard/payments",
+    path: "seller/dashboard/payments",
     element: <Payments />,
     role:"seller"
   },
   {
-    path: "/seller/dashboard/chat-customer",
+    path: "seller/dashboard/chat-customer",
     element: <ChatCustomer />,
     role:"seller"
   },
   {
-    path: "/seller/dashboard/chat-support",
+    path: "seller/dashboard/chat-support",
     element: <ChatSupport />,
     role:"seller"
   },

@@ -20,6 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
     if (user?.role) {
       const navs = getNavs(user.role);
       setAllNavs(navs);
+      console.log("n",navs)
     }
   }, [user?.role]);
 
@@ -47,8 +48,8 @@ const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
 
         <div className="px-[16px] mt-[20px]">
           <ul>
-            {allNavs.map((nav) => (
-              <li>
+            {allNavs.map((nav,index) => (
+              <li key={index}>
                 <NavLink
                   to={nav.path}
                   end
