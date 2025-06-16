@@ -1,26 +1,39 @@
-import { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink } from "react-router-dom";
+import toast from "react-hot-toast";
 import { FaStore } from "react-icons/fa";
+import type { RootState, AppDispatch } from "../../redux/store";
+import { clearMessages, seller_login } from "../../redux/reducers/authReducer";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const {setUser} = useAuth();
+  const { loader, errorMessage, successMessage } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === "seller@gmail.com" && password === "1234") {
-      setUser({
-        name:"rahul p",
-        role:"seller"
-      })
-      navigate("/seller/dashboard");
-    } else {
-      alert("Invalid seller credentials");
-    }
+    dispatch(seller_login({email,password}))
   };
+
+  useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(clearMessages())
+    }
+    if (successMessage) {
+      toast.success(successMessage);
+      dispatch(clearMessages())
+      navigate("/");
+    } 
+  }, [errorMessage, successMessage]);
+
+ 
 
   return (
     <div className="min-h-screen bg-blue-200 flex items-center justify-center">
@@ -43,7 +56,9 @@ const Login = () => {
             />
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Password</label>
+            <label className="text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               className="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -55,13 +70,51 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+            disabled={loader}
+            className={`w-full py-2 rounded-lg transition flex items-center justify-center gap-2
+            ${
+              loader
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }
+            `}
           >
-            Login
+            {loader ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
         <p className="text-xs text-center text-gray-400 mt-6">
-          Need help? Contact support@sellerhub.com
+          Dont have account? please{" "}
+          <NavLink
+            to="/register"
+            className="text-blue-600 font-bold cursor-pointer text-md"
+          >
+            Sign Up
+          </NavLink>
         </p>
       </div>
     </div>

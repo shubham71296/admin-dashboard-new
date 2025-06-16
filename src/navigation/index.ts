@@ -8,6 +8,5 @@ export const getNavs = (role: string) => {
         finalNavs.push(item);
       }
     });
-    console.log("final navs",finalNavs)
   return finalNavs;
 };

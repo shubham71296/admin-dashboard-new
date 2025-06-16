@@ -1,9 +1,11 @@
 import { Link, NavLink } from "react-router-dom";
 import dummyLogo from "../assets/dummylogo.jpeg";
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useSelector } from "react-redux";
 import { getNavs } from "../navigation";
 import type { allNavsProps } from "../navigation/allNavs";
+import type { RootState } from "../redux/store";
+
 
 interface SidebarProps {
   showSidebar: boolean;
@@ -11,18 +13,18 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ showSidebar, setShowSidebar }) => {
-  const { user } = useAuth();
-  //const role:string = "seller";
+  const { userInfo } = useSelector(
+      (state: RootState) => state.auth
+  );
   
   const [allNavs, setAllNavs] = useState<allNavsProps[]>([]);
   
   useEffect(() => {
-    if (user?.role) {
-      const navs = getNavs(user.role);
+    if (userInfo?.role) {
+      const navs = getNavs(userInfo.role);
       setAllNavs(navs);
-      console.log("n",navs)
     }
-  }, [user?.role]);
+  }, [userInfo?.role]);
 
   return (
     <div>

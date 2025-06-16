@@ -1,5 +1,6 @@
 import React from "react";
-import { useAuth } from "../context/AuthContext";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
 import { FaListUl } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import ProfileImgae from "../assets/profileimage.png";
@@ -10,7 +11,9 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ showSidebar, setShowSidebar }) => {
-  const { user } = useAuth();
+  const { userInfo } = useSelector(
+    (state: RootState) => state.auth
+  );
   return (
     <div className="fixed top-0 left-0 w-full py-2 px-2 z-40">
       <div className="py-3 px-4 bg-blue-300 lg:ml-[260px] rounded-md items-center flex space-x-4 justify-between">
@@ -36,8 +39,8 @@ const Header: React.FC<HeaderProps> = ({ showSidebar, setShowSidebar }) => {
 
         <div className="hidden lg:flex justify-center items-center space-x-2">
            <div className="">
-             <p className="font-bold">{user?.name}</p>
-             <p className="text-center text-blue-700 font-semibold">{user?.role}</p>
+             <p className="font-bold">{userInfo?.name}</p>
+             <p className="text-center text-blue-700 font-semibold">{userInfo?.role}</p>
            </div>
            <div className="">
             <img src={ProfileImgae} className="w-10 h-10 rounded-full"/>

@@ -4,10 +4,13 @@ import { adminRoutes } from "./routes/adminRoutes";
 import { sellerRoutes } from "./routes/sellerRoutes";
 import MainLayout from "../layout/MainLayout";
 import ProtectRoutes from "./routes/protectRoutes";
-import { useAuth } from "../context/AuthContext";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
 
 const Router = () => {
-  const {user} = useAuth();
+  const { userInfo} = useSelector(
+    (state: RootState) => state.auth
+  );
   return (
     <Routes>
       {publicRoutes.map(({ path, element }, idx) => (
@@ -17,7 +20,7 @@ const Router = () => {
       <Route
         path="/"
         element={
-          <ProtectRoutes allowedRoles={["admin", "seller"]} userRole={user?.role ?? null}>
+          <ProtectRoutes allowedRoles={["admin", "seller"]} userRole={userInfo?.role ?? null}>
             <MainLayout />
           </ProtectRoutes>
         }
@@ -27,7 +30,7 @@ const Router = () => {
             key={`admin-${idx}`}
             path={path}
             element={
-              <ProtectRoutes allowedRoles={[role]} userRole={user?.role ?? null}>
+              <ProtectRoutes allowedRoles={[role]} userRole={userInfo?.role ?? null}>
                 {element}
               </ProtectRoutes>
             }
@@ -39,7 +42,7 @@ const Router = () => {
             key={`seller-${idx}`}
             path={path}
             element={
-              <ProtectRoutes allowedRoles={[role]} userRole={user?.role ?? null}>
+              <ProtectRoutes allowedRoles={[role]} userRole={userInfo?.role ?? null}>
                 {element}
               </ProtectRoutes>
             }
