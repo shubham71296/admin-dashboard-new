@@ -1,27 +1,34 @@
-import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
-import cameraImg from "../../assets/camera.jpeg";
-import mobileImg from "../../assets/mobile.jpeg";
-import shoesImg from "../../assets/shoes-1.jpeg";
-import watchImg from "../../assets/watch-1.jpeg";
-import { useState } from "react";
+import { FaEye, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../../redux/store";
+import toast from "react-hot-toast";
+import {
+  clearMessages,
+  category_add,
+  get_category,
+  category_update,
+} from "../../redux/reducers/categoryReducer";
 
-interface categoryProps {
-  id: number;
-  image: string;
-  name: string;
+interface categoryItem {
+  _id: string;
+  category_name: string;
+  category_image: string;
 }
 
 const Category = () => {
-  const products_category: categoryProps[] = [
-    { id: 1, image: cameraImg, name: "camera" },
-    { id: 2, image: mobileImg, name: "mobile" },
-    { id: 3, image: shoesImg, name: "shoes" },
-    { id: 4, image: watchImg, name: "watch" },
-  ];
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { loader, errorMessage, successMessage, categories } = useSelector(
+    (state: RootState) => state.category
+  );
 
   const [categoryName, setCategoryName] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [categoryId, setCategoryId] = useState<string | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -39,7 +46,34 @@ const Category = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (isEditing && categoryId) {
+      dispatch(category_update({ categoryId, categoryName, imageFile }));
+    } else {
+      dispatch(category_add({ categoryName, imageFile }));
+    }
   };
+
+  useEffect(() => {
+    dispatch(get_category());
+  }, []);
+
+  useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage);
+      dispatch(clearMessages());
+    }
+    if (successMessage) {
+      toast.success(successMessage);
+      setIsEditing(false);
+      setCategoryId(null);
+      setCategoryName("");
+      setImagePreview(null);
+      setImageFile(null);
+      dispatch(get_category());
+      dispatch(clearMessages());
+    }
+  }, [errorMessage, successMessage]);
 
   return (
     <div className="p-2">
@@ -60,22 +94,32 @@ const Category = () => {
                 </tr>
               </thead>
               <tbody>
-                {products_category.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-100">
-                    <td className="px-4 py-2 border-b">{product.id}</td>
+                {categories.map((item: categoryItem) => (
+                  <tr key={item._id} className="hover:bg-gray-100">
+                    <td className="px-4 py-2 border-b">
+                      {item._id.slice(0, 5) + "..."}
+                    </td>
                     <td className="px-4 py-2 border-b">
                       <img
-                        src={product.image}
-                        alt={product.name}
+                        src={item.category_image}
+                        alt={item.category_name}
                         className="w-10 h-10 object-cover rounded"
                       />
                     </td>
-                    <td className="px-4 py-2 border-b">{product.name}</td>
+                    <td className="px-4 py-2 border-b">{item.category_name}</td>
                     <td className="px-4 py-2 border-b space-x-2">
                       <button className="text-blue-600 hover:text-blue-800 transition">
                         <FaEye />
                       </button>
-                      <button className="text-green-600 hover:text-green-800 transition">
+                      <button
+                        className="text-green-600 hover:text-green-800 transition"
+                        onClick={() => {
+                          setIsEditing(true);
+                          setCategoryId(item._id);
+                          setCategoryName(item.category_name);
+                          setImagePreview(item.category_image);
+                        }}
+                      >
                         <FaEdit />
                       </button>
                       <button className="text-red-600 hover:text-red-800 transition">
@@ -101,6 +145,7 @@ const Category = () => {
                 Category Name
               </label>
               <input
+                required
                 type="text"
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
@@ -110,17 +155,19 @@ const Category = () => {
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-blue-600 mb-1">
                 Category Image
               </label>
 
               <div className="flex items-center space-x-4">
-                <label
-                  htmlFor="imageInput"
-                  className="cursor-pointer inline-flex items-center px-4 py-2 text-blue-600 text-sm font-medium rounded-md shadow hover:bg-blue-700 hover:text-white transition"
-                >
-                  Upload Image
-                </label>
+                {!imagePreview && (
+                  <label
+                    htmlFor="imageInput"
+                    className="cursor-pointer inline-flex items-center px-4 py-2 text-blue-600 text-sm font-medium rounded-md shadow hover:bg-blue-700 hover:text-white transition"
+                  >
+                    Upload Image
+                  </label>
+                )}
                 <span
                   id="file-name"
                   className="text-gray-600 text-sm truncate max-w-[200px]"
@@ -136,23 +183,127 @@ const Category = () => {
                 className="hidden"
                 onChange={handleImageChange}
               />
+
               {imagePreview && (
-                <div className="mt-3">
+                <div className="relative mt-3 inline-block">
                   <img
                     src={imagePreview}
                     alt="Preview"
                     className="w-32 h-32 object-cover border rounded-md shadow"
                   />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImagePreview(null);
+                      setImageFile(null);
+                      const fileInput = document.getElementById(
+                        "imageInput"
+                      ) as HTMLInputElement;
+                      if (fileInput) fileInput.value = "";
+                    }}
+                    className="absolute top-[-8px] right-[-8px] bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition"
+                  >
+                    <FaTimes size={12} />
+                  </button>
                 </div>
               )}
             </div>
 
+            {/* <button
+              type="submit"
+              disabled={loader || !imageFile}
+              className={`w-full py-2 rounded-lg transition flex items-center justify-center gap-2
+            ${
+              loader || !imageFile
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }
+            `}
+            >
+              {loader ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8H4z"
+                    ></path>
+                  </svg>
+                </>
+              ) : (
+                <>{isEditing ? "Update Category" : "Add Category"}</>
+              )}
+            </button> */}
+
             <button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition w-full md:w-auto"
+              disabled={
+                loader ||
+                (!isEditing && !imageFile) ||
+                (isEditing && !imagePreview)
+              }
+              className={`w-full py-2 rounded-lg transition flex items-center justify-center gap-2
+    ${
+      loader || (!isEditing && !imageFile) || (isEditing && !imagePreview)
+        ? "bg-blue-400 cursor-not-allowed"
+        : "bg-blue-600 hover:bg-blue-700 text-white"
+    }
+  `}
             >
-              Add Category
+              {loader ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              ) : (
+                <>{isEditing ? "Update Category" : "Add Category"}</>
+              )}
             </button>
+
+            {isEditing && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditing(false);
+                  setCategoryId(null);
+                  setCategoryName("");
+                  setImagePreview(null);
+                  setImageFile(null);
+                }}
+                className="mt-3 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel Update
+              </button>
+            )}
           </form>
         </div>
       </div>

@@ -1,70 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Pagination from "../Pagination";
 import { FaEye } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../../redux/store";
+import { get_all_sellers } from "../../redux/reducers/sellerReducer";
 
-
-type SellerRequestDataProps = {
-  id: number;
-  name: string;
-  email: string; 
-  paymentStatus: "pending" | "completed" | "failed"; // Union for status
-  status: "active" | "deactive"
-};
 
 const SellerRequest = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { loader, sellers } = useSelector((state: RootState) => state.seller);
+  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const sellersStatusData: SellerRequestDataProps[] = [
-    {
-      id: 1,
-      name: "rahul",
-      email: "rahul@gmail.com",
-      paymentStatus: "pending",
-      status:"active"
-    },
-    {
-      id: 2,
-      name: "raj",
-      email: "raj@gmail.com",
-      paymentStatus: "pending",
-      status:"active"
-    },
-    {
-      id: 3,
-      name: "shyam",
-      email: "shyam@gmail.com",
-      paymentStatus: "completed",
-      status:"active"
-    },
-    {
-      id: 4,
-      name: "sohan",
-      email: "sohan@gmail.com",
-      paymentStatus: "pending",
-      status:"active"
-    },
-    {
-      id: 5,
-      name: "pranjal",
-      email: "pranjal@gmail.com",
-      paymentStatus: "pending",
-      status:"deactive"
-    },
-    {
-      id: 6,
-      name: "shivam",
-      email: "shivam@gmail.com",
-      paymentStatus: "pending",
-      status:"active"
-    },
-  ];
   
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentOrders = sellersStatusData.slice(indexOfFirstItem, indexOfLastItem);
+  const AllSellers = sellers.slice(indexOfFirstItem, indexOfLastItem);
+
+  useEffect(()=>{
+    dispatch(get_all_sellers());
+  },[])
 
   return (
     <div className="p-2">
@@ -75,30 +33,30 @@ const SellerRequest = () => {
             <thead className="bg-blue-300">
               <tr>
                 <th className="text-left px-4 py-2">Id</th>
-                <th className="text-left px-4 py-2">Image</th>
                 <th className="text-left px-4 py-2">Name</th>
                 <th className="text-left px-4 py-2">Email</th>
                 <th className="text-left px-4 py-2">Payment Status</th>
                 <th className="text-left px-4 py-2">Status</th>
+                <th className="text-left px-4 py-2">Action</th>
               </tr>
             </thead>
             <tbody>
-              {currentOrders.map((seller) => (
-                <tr key={seller.id} className="hover:bg-gray-100">
-                  <td className="px-4 py-2 border-b">{seller.id}</td>
+              {AllSellers.map((item) => (
+                <tr key={item._id} className="hover:bg-gray-100">
+                  <td className="px-4 py-2 border-b">{item._id.slice(0, 5) + "..."}</td>
                   
 
-                  <td className="px-4 py-2 border-b">{seller.name}</td>
-                  <td className="px-4 py-2 border-b">{seller.email}</td>
+                  <td className="px-4 py-2 border-b">{item.name}</td>
+                  <td className="px-4 py-2 border-b">{item.email}</td>
                   <td className="px-4 py-2 border-b">
                     <span
                       className={`text-xs font-semibold px-2 py-1 rounded ${
-                        seller.paymentStatus === "completed"
+                        item.payment === "completed"
                           ? "bg-green-200 text-green-800"
                           : "bg-yellow-200 text-yellow-800"
                       }`}
                     >
-                      {seller.paymentStatus}
+                      {item.payment}
                     </span>
                   </td>
 
@@ -106,12 +64,12 @@ const SellerRequest = () => {
                   <td className="px-4 py-2 border-b">
                     <span
                       className={`text-xs font-semibold px-2 py-1 rounded ${
-                        seller.status === "active"
+                        item.status === "active"
                           ? "bg-green-200 text-green-800"
                           : "bg-red-200 text-red-800"
                       }`}
                     >
-                      {seller.status}
+                      {item.status}
                     </span>
                   </td>
 
@@ -123,7 +81,7 @@ const SellerRequest = () => {
                       <FaEye />
                     </button> */}
                     <NavLink
-                      to={`/admin/dashboard/seller-details/${seller.id}`}
+                      to={`/admin/dashboard/seller-details/${item._id}`}
                       className="text-blue-600 hover:text-blue-800 transition"
                     >
                       <FaEye />
@@ -135,7 +93,7 @@ const SellerRequest = () => {
           </table>
         </div>
         <Pagination
-          totalItems={sellersStatusData.length}
+          totalItems={sellers.length}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}
           onPageChange={(page) => setCurrentPage(page)}

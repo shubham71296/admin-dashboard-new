@@ -17,7 +17,6 @@ interface ApiResponseError {
   message: string;
 }
 
-
 interface User {
   _id: string;
   name: string;
@@ -134,29 +133,23 @@ export const seller_login = createAsyncThunk<
 });
 
 export const user_info = createAsyncThunk<
-ApiUserInfoSuccess,
-string,
-{ rejectValue: ApiResponseError }
->(
-  "auth/user_info",
-  async (token, { rejectWithValue }) => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/user-info", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue({
-        message: error.response.data.message,
-      });
-    }
+  ApiUserInfoSuccess,
+  string,
+  { rejectValue: ApiResponseError }
+>("auth/user_info", async (token, { rejectWithValue }) => {
+  try {
+    const response = await axios.get("http://localhost:5000/api/user-info", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue({
+      message: error.response.data.message,
+    });
   }
-);
-
-
-
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -176,9 +169,9 @@ const authSlice = createSlice({
       })
       .addCase(admin_login.fulfilled, (state, action) => {
         state.loader = false;
-        state.successMessage = action.payload.message;
-        state.token = action.payload.token;
-        state.role = returnRole(action.payload.token);
+        state.successMessage = action.payload?.message;
+        state.token = action.payload?.token;
+        state.role = returnRole(action.payload?.token);
       })
       .addCase(admin_login.rejected, (state, action) => {
         state.loader = false;
@@ -217,7 +210,6 @@ const authSlice = createSlice({
         state.errorMessage = action.payload?.message || "Something went wrong";
       })
 
-
       .addCase(user_info.pending, (state) => {
         state.loader = true;
         state.successMessage = "";
@@ -232,8 +224,6 @@ const authSlice = createSlice({
         state.loader = false;
         state.errorMessage = action.payload?.message || "Something went wrong";
       });
-
-      
   },
 });
 
